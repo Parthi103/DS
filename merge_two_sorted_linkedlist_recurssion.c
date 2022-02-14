@@ -1,3 +1,6 @@
+/*Merge common elements from 2 lists and return a new third list using recurssion */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
