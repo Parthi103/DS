@@ -5,10 +5,10 @@
 
 
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 typedef struct node_s
 {
@@ -22,6 +22,7 @@ typedef struct node_s
 
 int degree_max = 0;
 int degree_val = -1;
+int min_subarray_len = INT_MAX;
 
 node_t *create_node(int data, int index)
 {
@@ -55,6 +56,7 @@ node_t *insert_into_tree(node_t *root, int data, int index)
 	{
 		root = create_node(data, index);
 		update_degree(data, 1);
+        return root;
 	}
 
 	temp = root;
@@ -111,6 +113,25 @@ void print_tree(node_t *root)
 
 }
 
+void update_len_min_subarray(node_t *root)
+{
+	if(root->freq == degree_max)
+	{
+		if(min_subarray_len > (root->end_index - root->start_index + 1))
+			min_subarray_len = (root->end_index - root->start_index + 1);
+	}
+	return;
+}
+
+void calculate_min_subarray(node_t *root)
+{
+	if(root == NULL)
+		return;
+
+	update_len_min_subarray(root);
+	calculate_min_subarray(root->left);
+	calculate_min_subarray(root->right);
+}
 
 node_t * find_node(node_t *root, int data)
 {
@@ -137,33 +158,26 @@ node_t * find_node(node_t *root, int data)
 	return NULL;
 }
 
+int findShortestSubArray(int* nums, int numsSize){
 
-int main()
-{
-	int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 1, 2, 3, 3, 3, 3, 3};
-	int arr_size = (sizeof(arr)/sizeof(int));
-	int i = 0;
-	node_t *root = NULL;
-	node_t *res = NULL;
-
-	for( i = 0; i < arr_size; i++)
+    int i = 0;
+    degree_max = 0;
+    degree_val = -1;
+    min_subarray_len = INT_MAX;
+    
+    node_t *root = NULL;
+    
+    for( i = 0; i < numsSize; i++)
 	{
-		root = insert_into_tree(root, arr[i], i);
+        printf("Inserting : %d\n", nums[i]);
+		root = insert_into_tree(root, nums[i], i);
 	}
-  printf("Printing contents of tree\n");
-	print_tree(root);
+    
+    print_tree(root);
 
-	printf("\nMax Degree : %d , Max Val : %d\n", degree_max, degree_val);
-
-	res = find_node(root, degree_val);
-
-	if(res == NULL)
-	{
-		printf("Error in find_node\n");
-		return 0;
-	}
-
-	printf("Length of Min Subarray : %d\n", (res->end_index - res->start_index + 1));
-
-	return 0;
+    printf("\n Max Degree : %d , Max Val : %d\n", degree_max, degree_val);
+    
+    calculate_min_subarray(root);
+    
+    return min_subarray_len;
 }
